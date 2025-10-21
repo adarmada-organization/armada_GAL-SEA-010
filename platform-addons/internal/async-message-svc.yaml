@@ -1,0 +1,77 @@
+component: async-message-svc
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL:  https://github.com/armadasystems/async-message-svc
+version: 'main'
+gitPath: 'async-message-svc/helm/async-message-svc'
+
+autoSync: true
+namespace: async-message-svc
+release: async-message-svc
+
+valuesObject:
+  
+  image:
+    repository: harbor.armada.internal:30003/proxy-cache-project/async-message-svc
+    tag: "sha-e44cd16"
+    pullPolicy: Always 
+  podAnnotations:
+    vault.hashicorp.com/agent-inject: 'true'
+    vault.hashicorp.com/agent-init-first: "true"
+    vault.hashicorp.com/service: "http://hcvault.hcvault:8200"
+    vault.hashicorp.com/role: 'async-message-svc'
+    vault.hashicorp.com/agent-inject-secret-async-message-config.env: 'armada/async-message-svc/config'
+    vault.hashicorp.com/agent-inject-template-async-message-config.env: |
+      {{- with secret "armada/async-message-svc/config" -}}
+        export KAFKA_PASSWORD="{{ .Data.data.PASSWORD }}"
+        export KAFKA_ADMIN_PASSWORD="{{ .Data.data.ADMIN_PASSWORD}}"
+      {{- end -}}
+  Queue:
+    kafkaConsumer:
+      topic : "Queue"
+      properties:
+        security.protocol: 'SASL_PLAINTEXT'
+        sasl.mechanism: 'SCRAM-SHA-256'
+        sasl.username: "user1"
+        sasl.password: "b0lDfmhlGN"
+        bootstrap.servers: "kafka.kafka.svc.cluster.local:9092"
+        group.id: "QueueConsumer"
+
+  DeadLetterQueue:
+    kafkaProducer:
+      topic : "DeadLetterQueue"
+      properties:
+        security.protocol: 'SASL_PLAINTEXT'
+        sasl.mechanism: 'SCRAM-SHA-256'
+        sasl.username: "user1"
+        sasl.password: null  
+        statistics.interval.ms: 5000
+        queue.buffering.max.kbytes: 1572864
+        socket.keepalive.enable: true
+        metadata.max.age.ms: 180000
+        request.timeout.ms: 60000
+        connections.max.idle.ms: 180000
+        bootstrap.servers: "kafka.kafka.svc.cluster.local:9092"
+    kafkaConsumer:
+      topic : "DeadLetterQueue"
+      properties:
+        security.protocol: 'SASL_PLAINTEXT'
+        sasl.mechanism: 'SCRAM-SHA-256'
+        sasl.username: "user1"
+        sasl.password: null
+        bootstrap.servers: "kafka.kafka.svc.cluster.local:9092"
+        group.id: "DeadQueueConsumer"
+    maxDuration: 30
+  Admin:
+    properties:
+      bootstrap.servers: "kafka.kafka.svc.cluster.local:9092"
+      security.protocol: 'SASL_PLAINTEXT'
+      sasl.mechanism: 'SCRAM-SHA-256'
+      sasl.username: "user1"
+      sasl.password: null
+  logLevel: "debug"    
+
+

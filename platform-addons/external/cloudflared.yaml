@@ -1,0 +1,17 @@
+component: cloudflared
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL:  https://github.com/armadasystems/galleon-platform-apps
+version: 'main'
+gitPath: 'helm-charts/cloudflare-tunnel-remote'
+
+autoSync: true
+namespace: cloudflared
+release: cloudflare-tunnel
+
+valuesObject:
+  cloudflare:
+    tunnel_token: eyJhIjoiYjlmMmNiZDE3ZTY2ZDY1NzFkZDlmNjY0MmI1N2QyNGUiLCJ0IjoiZGU4NjZiM2UtZDI1My00OTI0LWI4YjItNzQ3ZjA1M2Y4YzVlIiwicyI6IllXRTFPV0ptTTJZdFpUZGpOaTAwTmpFMUxXSXdaR0V0WWprM05HVXpZV1ZqTW1JdyJ9

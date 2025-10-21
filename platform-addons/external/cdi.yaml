@@ -1,0 +1,12 @@
+component: cdi
+project: platform-addons
+
+useYamlFile: true
+useHelmRepo: false
+
+repoURL: https://github.com/armadasystems/galleon-platform-apps.git
+version: main
+gitPath: 'manifests/cdi/v1.61.0'
+
+autoSync: true
+namespace: cdi

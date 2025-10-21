@@ -1,0 +1,15 @@
+component: strimzi-operator
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL:  https://github.com/armadasystems/galleon-platform-apps
+version: 'feature/ANJ/add_strimzi_kafka_cluster'
+gitPath: 'helm-charts/strimzi-operator'
+
+autoSync: true
+namespace: strimzi
+release: strimzi-operator
+
+valuesObject:

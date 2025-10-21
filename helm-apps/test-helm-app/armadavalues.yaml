@@ -1,0 +1,5 @@
+armada:
+  application:
+    id: applicationId
+    version: versionId
+    instance: instanceId

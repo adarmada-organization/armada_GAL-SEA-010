@@ -1,0 +1,5 @@
+component: f7fdcd5f-e636-477f-9b8c-5d7706ebb775
+repoURL: https://github.com/armada-galleons-dev/demo-marketplace-apps.git
+chartPath: charts/pacman/0.1.20/pacman
+targetRevision: main
+namespace: pacm-f7fdcd5f-e636-477f-9b8c-5d7706ebb775

@@ -1,0 +1,78 @@
+component: rook-ceph-cluster
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL:  https://charts.rook.io/release
+ChartName: rook-ceph-cluster
+version: v1.13.6
+
+autoSync: true
+namespace: rook-ceph
+release: rook-ceph-cluster
+
+valuesObject:
+  # Values for a multi-node rook-ceph cluster
+  # Reference:
+  # - https://github.com/rook/rook/blob/v1.13.6/Documentation/Helm-Charts/ceph-cluster-chart.md
+  # - https://github.com/rook/rook/blob/v1.13.6/deploy/charts/rook-ceph-cluster/values.yaml
+  monitoring:
+    enabled: true
+  toolbox:
+    enabled: true
+    tolerations: []
+
+  cephClusterSpec:
+    monitoring:
+      enabled: true
+    labels:
+      monitoring:
+        release: kube-prometheus-stack
+    mon:
+      allowMultiplePerNode: true
+    mgr:
+      modules: []
+    storage:
+      config:
+        encryptedDevice: "true"
+    placement:
+      all:
+        tolerations:
+        - key: storage-node
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+
+  # Specify all the parameters in the list element to override values properly
+  cephBlockPools:
+    - name: replicapool
+      spec:
+        failureDomain: host
+        replicated:
+          size: 3
+          requireSafeReplicaSize: true
+      storageClass:
+        enabled: true
+        name: rook-ceph-block
+        annotations: {}
+        labels: {}
+        isDefault: true
+        reclaimPolicy: Delete
+        allowVolumeExpansion: true
+        volumeBindingMode: "Immediate"
+        mountOptions: []
+        allowedTopologies: []
+        parameters:
+          imageFormat: "2"
+          imageFeatures: layering
+          csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+          csi.storage.k8s.io/provisioner-secret-namespace: "{{ .Release.Namespace }}"
+          csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+          csi.storage.k8s.io/controller-expand-secret-namespace: "{{ .Release.Namespace }}"
+          csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+          csi.storage.k8s.io/node-stage-secret-namespace: "{{ .Release.Namespace }}"
+          csi.storage.k8s.io/fstype: ext4
+
+  cephFileSystems: []
+  cephObjectStores: []

@@ -1,0 +1,68 @@
+component: metrics-api
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL:  https://github.com/armadasystems/observability
+version: 'main'
+gitPath: 'metrics-api/helm/metrics-api'
+
+autoSync: true
+namespace: metrics-api
+release: metrics-api
+
+valuesObject:
+  image:
+    repository: harbor.armada.internal:30003/proxy-cache-project/metrics-api
+    tag: "sha-aa361fd"
+  podAnnotations: 
+    vault.hashicorp.com/agent-inject: 'true'
+    vault.hashicorp.com/agent-init-first: "true"
+    vault.hashicorp.com/service: "http://hcvault.hcvault:8200"
+    vault.hashicorp.com/role: 'metrics-api'
+    vault.hashicorp.com/agent-inject-secret-azure-config.env: 'armada/metrics-api/config'
+    vault.hashicorp.com/agent-inject-template-azure-config.env: |
+      {{- with secret "armada/metrics-api/config" -}}
+        export KAFKA_PASSWORD="{{ .Data.data.password }}"
+        export LOKI_PASSWORD="{{ .Data.data.loki_password }}"
+      {{- end -}}
+  virtualService:
+    enabled: false
+  galleon:
+    podMonitor:
+      enabled: true
+    authentication:
+      enabled: true
+      issuer: "https://keycloak.dev.armada.ai/realms/armada"
+      jwksUri: "https://keycloak.dev.armada.ai/realms/armada/protocol/openid-connect/certs"         
+  authorization:
+    enabled: true
+  loki:
+    enabled: true  
+    endpoint: "http://10.20.22.230:80"
+    batchSize: 1000
+    maxLogLimit: 50000
+    maxRetries: 3
+    username: "lokiuser"
+    tenantId: "dev-main"  
+  pushAlerts:
+    enabled: true 
+    endpoint: http://ilb.dev.armada.internal/metrics-api
+    kafka:
+      topic: "Queue"
+      properties:
+        security.protocol: 'SASL_PLAINTEXT'
+        sasl.mechanism: 'SCRAM-SHA-256'
+        sasl.username: "user1"
+        sasl.password: null
+        statistics.interval.ms: 5000
+        queue.buffering.max.kbytes: 1572864
+        socket.keepalive.enable: true
+        metadata.max.age.ms: 180000
+        request.timeout.ms: 60000
+        connections.max.idle.ms: 180000
+        bootstrap.servers: "kafka.kafka.svc.cluster.local:9092"            
+  staticConfigFilePath: config/staticConfigGalleon.yaml  
+
+  

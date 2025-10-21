@@ -1,0 +1,30 @@
+component: velero-crs
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL: https://github.com/armadasystems/galleon-platform-apps
+version: 'dr/velero-templates'
+gitPath: 'helm-charts/velero'
+
+namespace: velero
+release: velero-crs
+autoSync: true
+
+valuesObject:
+  backups:
+    - name: test-backup-1
+      includedNamespaces:
+        - monitoring
+      defaultVolumesToFsBackup: false
+      snapshotVolumes: false
+      ttl: 24h
+      storageLocation: scheduled-all-namespaces
+    - name: test-backup-2
+      includedNamespaces:
+        - postgres
+      defaultVolumesToFsBackup: false
+      snapshotVolumes: false
+      ttl: 24h
+      storageLocation: scheduled-all-namespaces

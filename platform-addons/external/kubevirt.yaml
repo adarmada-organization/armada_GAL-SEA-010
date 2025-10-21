@@ -1,0 +1,12 @@
+component: kubevirt
+project: platform-addons
+
+useYamlFile: true
+useHelmRepo: false
+
+repoURL: https://github.com/armadasystems/galleon-platform-apps.git
+version: gr/snapshot
+gitPath: 'manifests/kubevirt/v1.6.0'
+
+autoSync: true
+namespace: kubevirt

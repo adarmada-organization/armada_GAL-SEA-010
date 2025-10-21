@@ -1,0 +1,5 @@
+component: 14d2b8f1-3047-4cd1-acf0-b88623234ef6
+repoURL: https://github.com/armada-galleons-dev/demo-marketplace-apps.git
+chartPath: charts/ita/1.0.0-RELEASE/ita
+targetRevision: main
+namespace: ita-14d2b8f1-3047-4cd1-acf0-b88623234ef6

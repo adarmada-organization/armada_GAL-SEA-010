@@ -1,0 +1,138 @@
+component: kube-prometheus-stack
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL:  https://prometheus-community.github.io/helm-charts
+ChartName: kube-prometheus-stack
+version: 78.4.0 #62.0.0
+
+autoSync: true
+namespace: monitoring
+release: kube-prometheus-stack
+
+valuesObject:
+  prometheus:
+    prometheusSpec:
+      ruleSelector:
+        matchLabels:
+          ruleSet: armada
+      serviceMonitorSelector: {}
+      serviceMonitorNamespaceSelector: {}
+      # Remote write configurations for prometheus
+      remoteWrite:
+      - name: cortex-dev
+        url: http://ilb.dev.armada.internal/cortex/api/v1/push
+        # remote_timeout: 30s
+        headers:
+          X-Scope-OrgID: 87284dde-9e87-4e25-90fd-131f10ab6f79
+        writeRelabelConfigs:
+        - action: replace
+          sourceLabels: []
+          targetLabel: armadaResource
+          replacement: 7bb1fb9e-1b57-4f83-9347-e439ae221688
+        - sourceLabels: []
+          targetLabel: galleonName
+          action: replace
+          replacement: dev-main          
+      - name: amw-dev
+        url: https://prommon-1qxl.westus2-1.metrics.ingest.monitor.azure.com/dataCollectionRules/dcr-c95c77fd7d3b409ab770721a765c252e/streams/Microsoft-PrometheusMetrics/api/v1/write?api-version=2023-04-24
+        headers:
+          X-Scope-OrgID: anonymous
+        writeRelabelConfigs:
+        - action: replace
+          sourceLabels: []
+          targetLabel: armadaResource
+          replacement: 7bb1fb9e-1b57-4f83-9347-e439ae221688
+        - sourceLabels: []
+          targetLabel: galleonName
+          action: replace
+          replacement: dev-main           
+        oauth2:
+          clientId:
+            secret:
+              name: commander-metrics-client-secret
+              key: client_id
+          clientSecret:
+            name: commander-metrics-client-secret
+            key: client_secret
+          tokenUrl: https://login.microsoftonline.com/8f231c2a-9551-4b40-be17-5b24afe5e890/oauth2/v2.0/token
+          scopes:
+          - https://monitor.azure.com/.default
+
+
+  ## Configuration for alertmanager
+  alertmanager:
+    config:
+      route:
+        receiver: 'webhook_receiver'
+        routes: 
+          - receiver: 'null'
+            match:
+              alertname: Watchdog
+      receivers:
+        - name: 'webhook_receiver'
+          webhook_configs:
+            - url: 'http://metrics-api.metrics-api.svc.cluster.local/api/v1/alerts/notification'
+        - name: 'null'  
+      inhibit_rules:
+        - source_match_re:
+            severity: 'critical'
+          target_match_re:
+            severity: 'warning'
+        - source_match_re:
+            severity: 'offline'
+          target_match_re:
+            severity: 'info'
+        - source_match_re:
+            severity: 'offline'
+          target_match_re:
+            severity: 'warning'
+        - source_match_re:
+            severity: 'offline'
+          target_match_re:
+            severity: 'critical'
+  defaultRules:
+    labels:
+      ruleSet: armada
+
+  ## Configuration for grafana
+  grafana:
+    service:
+      port: 443
+    extraSecretMounts:
+    - name: grafana-tls
+      mountPath: /etc/grafana/tls
+      secretName: grafana-tls
+      readOnly: true
+    - name: azure-wi-token
+      mountPath: /var/run/secrets/azure/tokens
+      readOnly: true
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            audience: api://AzureADTokenExchange
+            expirationSeconds: 3600
+            path: azure-identity-token
+    grafana.ini:
+      auth.azuread:
+        enabled: true
+        client_authentication: workload_identity
+        token_url: https://login.microsoftonline.com/8f231c2a-9551-4b40-be17-5b24afe5e890/oauth2/v2.0/token
+        auth_url: https://login.microsoftonline.com/8f231c2a-9551-4b40-be17-5b24afe5e890/oauth2/v2.0/authorize
+        federated_credential_audience: api://AzureADTokenExchange
+        client_id: cf6c97a5-72ee-414d-9846-0eb91125efb0
+        workload_identity_token_file: /var/run/secrets/azure/tokens/azure-identity-token
+      security:
+        cookie_secure: true
+        cookie_samesite: false
+      server:
+        root_url: https://grafana-colo.armadaapps.ai
+        enforce_domain: false
+        protocol: https
+        router_logging: true
+        cert_file: /etc/grafana/tls/tls.crt
+        cert_key: /etc/grafana/tls/tls.key
+

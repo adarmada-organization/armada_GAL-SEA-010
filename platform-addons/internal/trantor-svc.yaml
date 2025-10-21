@@ -1,0 +1,17 @@
+component: trantor-svc
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL:  https://github.com/armadasystems/trantor-svc
+version: 'anoop/galleon-deploy-helm-changes'
+gitPath: 'helm/trantor-svc-galleon'
+
+autoSync: true
+namespace: trantor-svc
+release: trantor-svc
+
+valuesObject:
+  image:
+    tag: "sha-c4bf0dc"

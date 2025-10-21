@@ -1,0 +1,24 @@
+component: 5b25f987-7c66-4fb7-b066-9be3569e7cf5
+repoURL: https://github.com/armada-galleons-dev/demo-marketplace-apps.git
+chartPath: charts/dev-vm-workspace/0.1.0/dev-vm-workspace
+targetRevision: main
+namespace: devvmwork-5b25f987-7c66-4fb7-b066-9be3569e7cf5
+valuesObject:
+  vms:
+  - name: test-1
+    vmId: a67aefe3-1057-4fdc-8daf-b17a5378869b
+    cores: 1
+    memory: 2Gi
+    storageSize: 50Gi
+    gpu: ''
+    osType: linux
+    osVariant: ubuntu-22.04
+    networking:
+      ports:
+      - name: ssh
+        port: 22
+        protocol: TCP
+      - name: http
+        port: 8080
+        protocol: HTTP
+    running: true

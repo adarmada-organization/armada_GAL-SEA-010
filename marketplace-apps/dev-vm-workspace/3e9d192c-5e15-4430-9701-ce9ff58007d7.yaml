@@ -1,0 +1,47 @@
+component: 3e9d192c-5e15-4430-9701-ce9ff58007d7
+repoURL: https://github.com/armada-galleons-dev/demo-marketplace-apps.git
+chartPath: charts/dev-vm-workspace/0.1.0/dev-vm-workspace
+targetRevision: main
+namespace: devvmwork-3e9d192c-5e15-4430-9701-ce9ff58007d7
+valuesObject:
+  vms:
+  - name: testing1
+    vmId: 8653034a-c47f-4e69-9602-046a2ed220f7
+    cores: 4
+    memory: 4Gi
+    storageSize: 50Gi
+    gpu: ''
+    osType: linux
+    osVariant: ubuntu-22.04
+    networking:
+      ports:
+      - name: ssh
+        port: 22
+        protocol: TCP
+      - name: webserver
+        port: 8080
+        protocol: TCP
+    running: true
+  - name: windows-vm
+    vmId: 5fdfc9c7-cefe-4135-a5b0-f91cf37169aa
+    cores: 1
+    memory: 2Gi
+    storageSize: 250Gi
+    gpu: ''
+    osType: windows
+    osVariant: windows-server-2022
+    networking:
+      ports:
+      - name: rdp
+        port: 3389
+        protocol: TCP
+    running: true
+  snapshots:
+  - name: zxczc
+    vmName: testing1
+  - name: test
+    vmName: testing1
+  - name: windows-snap-1
+    vmName: windows-vm
+  - name: tse
+    vmName: windows-vm

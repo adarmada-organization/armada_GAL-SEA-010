@@ -1,0 +1,15 @@
+component: loki
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL: https://github.com/armadasystems/galleon-platform-apps
+version: gg/feature/loki
+gitPath: helm-charts/loki
+
+autoSync: true
+namespace: loki
+release: loki
+
+valuesObject:

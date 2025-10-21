@@ -1,0 +1,47 @@
+---
+component: idrac-exporter
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL: https://mrlhansen.github.io/idrac_exporter
+ChartName: idrac-exporter
+version: 2.2.0
+
+autoSync: true
+namespace: monitoring
+release: idrac-exporter
+
+valuesObject:
+  prometheus:
+  monitor:
+    enabled: true
+    additionalLabels:
+       release: kube-prometheus-stack
+  address: 0.0.0.0
+  port: 9348
+  timeout: 10
+  hosts:
+    default:
+      username: user
+      password: pass
+  metrics:
+    all: true
+    processors: false
+    system: false
+    sensors: false
+    power: false
+    events: false
+    storage: false
+    memory: false
+    network: false
+    extra: false
+  metrics_prefix: idrac
+  tls:
+    enabled: false
+    cert_file: ""
+    key_file: ""
+  events:
+    severity: ok
+    maxage: 7d

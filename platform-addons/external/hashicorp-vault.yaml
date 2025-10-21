@@ -1,0 +1,93 @@
+component: hcvault
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL:  https://helm.releases.hashicorp.com
+ChartName: vault
+version: 0.28.1
+
+autoSync: true
+namespace: hcvault
+release: hcvault
+
+valuesObject:
+  server:
+    extraLabels:
+      azure.workload.identity/use: "true"
+    dev: { enabled: false }
+    ha:  { enabled: false }
+
+    standalone:
+      enabled: true
+      config: |
+        ui = true
+        disable_mlock = true
+
+        listener "tcp" {
+          address     = "[::]:8200"
+          tls_disable = 1
+          telemetry {
+            unauthenticated_metrics_access = "true"
+          }
+        }
+
+        storage "file" {
+          path = "/vault/data"
+        }
+
+        seal "azurekeyvault" {
+          tenant_id       = "8f231c2a-9551-4b40-be17-5b24afe5e890"
+          subscription_id = "212ddfb2-b7cf-4041-8eed-8882792f8d41"
+          resource_group  = "armada-galleon-dev"
+          vault_name      = "kv-armada-gal-dev-01"
+          key_name        = "vault-unseal-key"
+          client_id       = "cae31e7b-1aee-4e8a-8e99-310b2f8d7b2a"
+        }
+
+        telemetry {
+          prometheus_retention_time = "30s"
+          disable_hostname = true
+        }
+
+    dataStorage:
+      enabled: true
+      storageClass: rook-ceph-block
+      accessModes: [ReadWriteOnce]
+      size: 5Gi
+
+    readinessProbe:
+      path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+
+    serviceAccount:
+      create: true
+      name: hcvault
+      annotations:
+        azure.workload.identity/use: "true"
+        azure.workload.identity/client-id: "cae31e7b-1aee-4e8a-8e99-310b2f8d7b2a"
+        azure.workload.identity/tenant-id: "8f231c2a-9551-4b40-be17-5b24afe5e890"
+
+  ui:
+    enabled: true
+
+  serverTelemetry:
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+      scrapeTimeout: 10s
+      # Force Prometheus format
+      params:
+        format: ["prometheus"]
+      selectors:
+        release: kube-prometheus-stack 
+
+
+
+
+
+
+
+
+
+

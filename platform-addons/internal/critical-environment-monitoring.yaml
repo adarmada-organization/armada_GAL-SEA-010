@@ -1,0 +1,21 @@
+component: critical-environment-monitoring
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL:  https://github.com/armadasystems/armada-galleon-monitoring
+version: 'main'
+gitPath: 'helm/critical-environment-monitoring'
+
+autoSync: true
+namespace: critical-environment-monitoring
+release: critical-environment-monitoring
+
+valuesObject:
+  image:
+    repository: armadadevwestus3.azurecr.io/galleonmetrics
+    tag: "2.0"
+  env:
+    - name: ICONIC_AIR_HOST
+      value: "http://iconic-air.iconic-air.svc.cluster.local:8080"

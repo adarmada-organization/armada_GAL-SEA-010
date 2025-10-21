@@ -1,0 +1,45 @@
+component: rook-ceph
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL:  https://charts.rook.io/release
+ChartName: rook-ceph
+version: v1.13.6
+
+autoSync: true
+namespace: rook-ceph
+release: rook-ceph
+
+valuesObject:
+  # Values for rook-ceph-operator
+  # Reference: https://github.com/rook/rook/blob/v1.13.6/Documentation/Helm-Charts/operator-chart.md
+
+  image:
+    repository: rook/ceph
+    tag: v1.13.6
+  enableDiscoveryDaemon: true
+  csi:
+    provisionerTolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      - effect: NoExecute
+        key: node-role.kubernetes.io/etcd
+        operator: Exists
+    pluginTolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      - effect: NoExecute
+        key: node-role.kubernetes.io/etcd
+        operator: Exists
+  discover:
+    tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      - effect: NoExecute
+        key: node-role.kubernetes.io/etcd
+        operator: Exists

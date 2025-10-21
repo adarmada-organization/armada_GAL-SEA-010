@@ -1,0 +1,61 @@
+component: postgres
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL: https://charts.bitnami.com/bitnami
+ChartName: postgresql
+version: 15.5.0
+
+autoSync: true
+namespace: postgres
+release: postgres
+
+valuesObject:
+  postgresql:
+    username: "postgres"
+    password: 
+      valueFrom:
+        secretKeyRef:
+          name: postgres-secret       
+          key: POSTGRES_PASSWORD     
+    database: "postgres"
+  readinessProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+  replication:
+    enabled: false
+  service:
+    type: ClusterIP
+    port: 5432
+    targetPort: 5432
+  ui:
+    enabled: true
+
+  primary:
+    initdb:
+      scriptsSecret: ops-safety-postgres-init-scripts
+    podAnnotations:
+      vault.hashicorp.com/agent-inject: "true"
+      vault.hashicorp.com/agent-init-first: "true"
+      vault.hashicorp.com/service: "http://hcvault.hcvault:8200"
+      vault.hashicorp.com/role: "ops-safety-svc"
+      vault.hashicorp.com/agent-inject-secret-database-config.sh: "ops-safety-svc/config/db/postgres"
+      vault.hashicorp.com/agent-inject-template-database-config.sh: |
+        {{- with secret "armada/ops-safety-svc/config/db/postgres" -}}
+        #!/bin/sh
+        export DB_URL="{{ .Data.data.DB_URL }}"
+        export DB_USER="{{ .Data.data.DB_USER }}"
+        export DB_PWD="{{ .Data.data.DB_PWD }}"
+        {{- end -}}
+

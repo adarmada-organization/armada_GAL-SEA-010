@@ -1,0 +1,5 @@
+component: 905c2b5c-4bee-49ca-b15f-4e42e18b4fc3
+repoURL: https://github.com/armada-galleons-dev/demo-marketplace-apps.git
+chartPath: charts/ops-scope/0.1.0/ops-scope
+targetRevision: main
+namespace: opsscop-905c2b5c-4bee-49ca-b15f-4e42e18b4fc3

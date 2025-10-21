@@ -1,0 +1,43 @@
+component: galleon-ctrl-plane
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL:  https://github.com/armadasystems/galleon-ctrl-plane
+version: 'jh/updated-velero'
+gitPath: 'helm/galleon-ctrl-plane'
+
+autoSync: true
+namespace: galleon-ctrl-plane
+release: galleon-ctrl-plane
+
+valuesObject:
+  fullnameOverride: "galleon-ctrl-plane"
+  image:
+    tag: "sha-bf50c06"
+  env:
+    - name: ARGOCD_SERVER
+      value: "https://argocd-server.argocd.svc.cluster.local:443"
+    - name: DB_HOST
+      value: "galleon-ctrl-plane-postgresql"
+    - name: DB_PORT
+      value: "5432"
+    - name: DB_NAME
+      value: "armada-gcp"
+    - name: DB_SSL_MODE
+      value: "disable"
+    - name: EH_ACCESS_NAME
+      value: "RootManageSharedAccessKey"
+    - name: EVENT_HUB_NAMESPACE
+      value: "armada-dev-wus3-eh-kafka-ns"
+    - name: MARKETPLACE_TOPIC_NAME
+      value: "armada-dev-wus3-dp-eh-kafka-marketplace"
+    - name: PLATFORM_ADDONS_TOPIC_NAME
+      value: "armada-dev-wus3-dp-eh-kafka-platform-addons"
+
+
+
+
+
+

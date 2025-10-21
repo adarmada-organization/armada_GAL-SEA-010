@@ -1,0 +1,15 @@
+component: harbor-registry
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL:  https://github.com/armadasystems/galleon-platform-apps
+version: 'main'
+gitPath: 'helm-charts/harbor-registry'
+
+autoSync: true
+namespace: harbor
+release: harbor-registry
+
+valuesObject:

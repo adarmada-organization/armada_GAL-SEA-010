@@ -1,0 +1,16 @@
+component: edge-compute-alerts
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL: https://github.com/armadasystems/galleon-platform-apps
+version: main
+gitPath: helm-charts/EdgeComputeAlertDefinitions
+
+autoSync: true
+namespace: monitoring
+release: edge-compute
+
+valuesObject:
+  armadaResource: 7bb1fb9e-1b57-4f83-9347-e439ae221688

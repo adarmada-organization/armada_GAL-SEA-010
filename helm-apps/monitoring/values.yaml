@@ -1,0 +1,71 @@
+# Default values for monitoring.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# The following block under kube-prometheus-stack is
+# used by the dependency chart
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      hostAliases:
+      - ip: "10.0.0.77"
+        hostnames:
+        - "ilb.dev.armada.internal"
+      remoteWrite:
+        - name: cortex-dev
+          url: http://ilb.dev.armada.internal/cortex/api/v1/push
+          remote_timeout: 30s
+          headers:
+            X-Scope-OrgID: 87284dde-9e87-4e25-90fd-131f10ab6f79
+          writeRelabelConfigs:
+            - sourceLabels: []
+              targetLabel: armadaResource
+              replacement: 7bb1fb9e-1b57-4f83-9347-e439ae221688
+        - name: amw-dev
+          url: https://prommon-1qxl.westus2-1.metrics.ingest.monitor.azure.com/dataCollectionRules/dcr-c95c77fd7d3b409ab770721a765c252e/streams/Microsoft-PrometheusMetrics/api/v1/write?api-version=2023-04-24
+          headers:
+            X-Scope-OrgID: anonymous
+          writeRelabelConfigs:
+            - sourceLabels: []
+              targetLabel: armadaResource
+              replacement: 7bb1fb9e-1b57-4f83-9347-e439ae221688
+          oauth2:
+            clientId:
+              secret:
+                name: commander-metrics-dev-client-secret
+                key: client_id
+            clientSecret:
+              name: commander-metrics-dev-client-secret
+              key: client_secret
+            tokenUrl: https://login.microsoftonline.com/8f231c2a-9551-4b40-be17-5b24afe5e890/oauth2/v2.0/token
+            scopes: [ https://monitor.azure.com/.default ]      
+      additionalScrapeConfigs:
+      - job_name: critical-env-metrics
+        scrape_interval: 10s
+        metrics_path: /metrics
+        scheme: http
+        kubernetes_sd_configs:
+        - role: endpoints
+          namespaces:
+            names:
+            - monitoring
+          selectors:
+          - role: pod
+            label: app=galleonmetrics
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_node_name]
+          action: replace
+          target_label: kubernetes_nodes
+      - job_name: gpu-metrics
+        scrape_interval: 10s
+        metrics_path: /metrics
+        scheme: http
+        kubernetes_sd_configs:
+        - role: endpoints
+          namespaces:
+            names:
+            - gpu-operator
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_node_name]
+          action: replace
+          target_label: kubernetes_node            

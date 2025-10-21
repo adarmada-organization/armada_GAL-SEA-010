@@ -1,0 +1,71 @@
+---
+component: prometheus-snmp-exporter
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL: https://prometheus-community.github.io/helm-charts
+ChartName: prometheus-snmp-exporter
+version: 9.6.2
+
+autoSync: true
+namespace: monitoring
+release: prometheus-snmp-exporter
+
+valuesObject:
+  config:
+    create: false
+  existingConfigSecret: snmp-exporter-v3-config
+  extraSecrets:
+    - name: snmp-exporter-v3-config
+      data:
+        snmp.yml: |
+          modules:
+            default:
+              walk: interfaces
+              retries: 3
+              timeout: 5s
+              version: 3
+              max_repetitions: 25
+              auth:
+                user: $(username)
+                auth_protocol: SHA-256
+                auth_password: $(auth_password)
+                priv_protocol: AES
+                security_level: authNoPriv
+  extraVolumes:
+    - name: snmp-v3-creds
+      secret:
+        secretName: snmp-exporter-v3-creds
+  extraVolumeMounts:
+    - name: snmp-v3-creds
+      mountPath: /etc/snmp-v3-creds
+      readOnly: true
+
+  extraEnv:
+    - name: username
+      valueFrom:
+        secretKeyRef:
+          name: snmp-exporter-v3-creds
+          key: username
+    - name: auth_password
+      valueFrom:
+        secretKeyRef:
+          name: snmp-exporter-v3-creds
+          key: auth_password
+
+  configmapReload:
+    enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+  customLabels:
+    release: kube-prometheus-stack
+  resources:
+    limits:
+      cpu: 100m
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      memory: 200Mi

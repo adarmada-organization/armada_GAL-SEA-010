@@ -1,0 +1,16 @@
+# dependency of metrics-api 
+component: scylla-manager
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL: https://scylla-operator-charts.storage.googleapis.com/stable
+ChartName: scylla-manager
+version: 1.17.0
+
+autoSync: true
+namespace: scylla-manager
+release: scylla-manager
+
+valuesObject:

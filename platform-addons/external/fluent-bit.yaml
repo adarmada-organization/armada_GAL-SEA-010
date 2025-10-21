@@ -1,0 +1,112 @@
+component: fluent-bit
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL: https://fluent.github.io/helm-charts
+ChartName: fluent-bit
+version: 0.50.0
+release: fluent-bit
+namespace: fluent-bit
+autoSync: true
+
+valuesObject:
+  kind: DaemonSet
+
+  rbac:
+    create: true
+    nodeAccess: true
+    eventsAccess: false
+
+  serviceAccount:
+    create: true
+    name: fluent-bit-logging
+
+  image:
+    repository: fluent/fluent-bit
+    tag: 4.0.1
+
+  flush: 5
+  metricsPort: 2020
+  logLevel: info
+
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+    selector: 
+      release: kube-prometheus-stack
+
+  extraVolumes:
+    - name: fb-buffers
+      emptyDir:
+        medium: ""
+        sizeLimit: 5Gi
+  extraVolumeMounts:
+    - name: fb-buffers
+      mountPath: /buffers
+
+  config:
+    service: |
+      [SERVICE]
+          Daemon Off
+          Flush 5
+          Log_Level info
+          Parsers_File /fluent-bit/etc/parsers.conf
+          Parsers_File /fluent-bit/etc/conf/custom_parsers.conf
+          HTTP_Server On
+          HTTP_Listen 0.0.0.0
+          HTTP_Port 2020
+          Health_Check On
+          storage.path              /buffers
+          storage.sync              normal
+          storage.metrics           on
+          storage.backlog.mem_limit 10MB
+          storage.total_limit_size  2G
+
+    inputs: |
+      [INPUT]
+          Name                  tail
+          Path                  /var/log/containers/*.log
+          Tag                   kube.*
+          Read_from_Head        true
+          Refresh_Interval      5
+          Ignore_Older          1h
+          Skip_Long_Lines       On
+          Mem_Buf_Limit         64MB
+          Buffer_Chunk_Size     2MB
+          Buffer_Max_Size       8MB
+          DB                    /buffers/tail.db
+          DB.Sync               normal
+          storage.type          filesystem
+
+    filters: |
+      [FILTER]
+          Name                   kubernetes
+          Match                  kube.*
+          Kube_Tag_Prefix        kube.var.log.containers.
+          Keep_Log               Off
+          Merge_Log              On   
+          Merge_Log_Key          log  
+          K8S-Logging.Parser     On
+          K8S-Logging.Exclude    Off
+
+    outputs: |
+      [OUTPUT]
+          Name     loki
+          Match    kube.*
+          Host     loki-gateway.loki.svc.cluster.local
+          Port     80
+          HTTP_User   lokiuser
+          HTTP_Passwd lokipass
+          Header   X-Scope-OrgID dev-main
+          Labels   job=dev-main-logs,namespace=$kubernetes['namespace_name'],pod=$kubernetes['pod_name'],container=$kubernetes['container_name']
+          Log_Level info
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 1500Mi
+      cpu: 500m

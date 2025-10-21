@@ -1,0 +1,17 @@
+component: cloudflared-skydio
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL:  https://github.com/armadasystems/galleon-platform-apps
+version: 'main'
+gitPath: 'helm-charts/cloudflare-tunnel-remote'
+
+autoSync: true
+namespace: cloudflared-skydio
+release: cloudflare-tunnel
+
+valuesObject:
+  cloudflare:
+    tunnel_token: eyJhIjoiYjlmMmNiZDE3ZTY2ZDY1NzFkZDlmNjY0MmI1N2QyNGUiLCJ0IjoiYTcwNzRlNTQtZGVmZi00NTkyLWE4YmEtZGFmMzJlZjQxZGJjIiwicyI6IlpHRXhPRFF5T1RFdE9XVmtOUzAwTURVekxXRmpNbVV0T0RZd04yUmlPRFE1TWpabSJ9

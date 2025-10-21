@@ -1,0 +1,15 @@
+component: istio
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: false
+
+repoURL: https://github.com/armadasystems/galleon-platform-apps
+version: main
+gitPath: helm-charts/istio
+
+autoSync: true
+namespace: istio-system
+release: istio
+
+valuesObject:

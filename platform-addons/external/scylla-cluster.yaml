@@ -1,0 +1,47 @@
+# dependency of metrics-api 
+component: scylla-db
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL: https://scylla-operator-charts.storage.googleapis.com/stable
+ChartName: scylla
+version: 1.13.0
+
+autoSync: true
+namespace: scylla
+release: scylla
+
+valuesObject:
+  datacenter: local
+  racks:
+  - members: 3
+    name: r1
+    placement:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - scylla
+            topologyKey: kubernetes.io/hostname
+          weight: 1
+    resources:
+      limits:
+        cpu: 1
+        memory: 4Gi
+      requests:
+        cpu: 1
+        memory: 4Gi
+    scyllaAgentConfig: scylla-agent-config
+    scyllaConfig: scylla-config
+    storage:
+      capacity: 10Gi
+  sysctls:
+  - fs.aio-max-nr=6553500
+  scyllaArgs: "--smp 1 --memory 2G"
+  developerMode: true

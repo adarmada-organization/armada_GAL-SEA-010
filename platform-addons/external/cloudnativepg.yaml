@@ -1,0 +1,94 @@
+component: cnpg
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+repoURL: https://cloudnative-pg.github.io/charts
+ChartName: cloudnative-pg
+version: 0.21.6
+
+autoSync: true
+namespace: cnpg-system
+release: cloudnative-pg
+
+valuesObject:
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/cloudnative-pg/cloudnative-pg
+    tag: 1.27.0
+    pullPolicy: Always
+
+  serviceAccount:
+    create: true
+    name: cnpg-manager
+
+  rbac:
+    create: true
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+
+  controllerManager:
+    enabled: true
+    args:
+      - controller
+      - --leader-elect
+      - --max-concurrent-reconciles=10
+      - --config-map-name=cnpg-controller-manager-config
+      - --secret-name=cnpg-controller-manager-config
+      - --webhook-port=9443
+    env:
+      - name: OPERATOR_IMAGE_NAME
+        value: ghcr.io/cloudnative-pg/cloudnative-pg:1.27.0
+      - name: MONITORING_QUERIES_CONFIGMAP
+        value: cnpg-default-monitoring
+    probes:
+      liveness:
+        enabled: true
+        path: /readyz
+        port: 9443
+        scheme: HTTPS
+      readiness:
+        enabled: true
+        path: /readyz
+        port: 9443
+        scheme: HTTPS
+      startup:
+        enabled: true
+        path: /readyz
+        port: 9443
+        scheme: HTTPS
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 10001
+      runAsGroup: 10001
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+
+  webhook:
+    port: 9443
+    secretName: cnpg-webhook-cert
+    certMountPath: /run/secrets/cnpg.io/webhook
+
+  volumes:
+    - name: scratch-data
+      emptyDir: {}
+    - name: webhook-certificates
+      secret:
+        secretName: cnpg-webhook-cert
+        defaultMode: 420
+        optional: true
+
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  monitoring:
+    enabled: false

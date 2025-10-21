@@ -1,0 +1,70 @@
+---
+component: prometheus-blackbox-exporter
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL: https://prometheus-community.github.io/helm-charts
+ChartName: prometheus-blackbox-exporter
+version: 11.4.0
+
+autoSync: true
+namespace: monitoring
+release: prometheus-blackbox-exporter
+
+valuesObject:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+      add: ["NET_RAW"]
+  resources:
+    limits:
+      cpu: 100m
+      memory: 100Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+  serviceMonitor:
+    selfMonitor:
+      enabled: true
+    enabled: true
+    defaults:
+       labels:
+          release: kube-prometheus-stack
+  configReloader:
+    enabled: false
+  service:
+    type: ClusterIP
+    port: 9115
+  replicaCount: 1
+  config:
+    modules:
+      http_2xx:
+        prober: http
+        timeout: 5s
+        http:
+          valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+          method: GET
+          headers:
+            User-Agent: "Blackbox Exporter"
+      dns_udp:
+        prober: dns
+        timeout: 5s
+        dns:
+          transport_protocol: "udp"
+          query_name: "google.com"
+          query_type: "A"
+      tcp_connect:
+        prober: tcp
+        timeout: 5s
+      icmp:
+        prober: icmp
+        timeout: 10s
+        icmp:
+          preferred_ip_protocol: "ip4"

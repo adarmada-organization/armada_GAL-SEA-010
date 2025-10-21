@@ -1,0 +1,35 @@
+---
+component: prometheus-smartctl-exporter
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL: https://prometheus-community.github.io/helm-charts
+ChartName: prometheus-smartctl-exporter
+version: 0.16.0
+
+autoSync: true
+namespace: monitoring
+release: prometheus-smartctl-exporter
+
+valuesObject:
+  common:
+    config:
+      bind_to: "0.0.0.0:9633"
+      url_path: "/metrics"
+      smartctl_location: /usr/sbin/smartctl
+      collect_not_more_than_period: 120s
+  resources:
+    limits:
+      cpu: 100m
+      memory: 100Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+  serviceMonitor:
+    enabled: true
+    extraLabels:
+      release: kube-prometheus-stack
+  prometheusRules:
+    enabled: false

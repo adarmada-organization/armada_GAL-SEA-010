@@ -1,0 +1,18 @@
+# dependency of metrics-api 
+component: cert-manager
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL: https://charts.jetstack.io
+ChartName: cert-manager
+version: 1.15.1
+
+autoSync: true
+namespace: cert-manager
+release: cert-manager
+
+valuesObject:
+  crds:
+    enabled: true 

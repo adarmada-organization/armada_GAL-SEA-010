@@ -1,0 +1,23 @@
+component: gpu-operator
+project: platform-addons
+
+useYamlFile: false
+useHelmRepo: true
+
+repoURL:  https://helm.ngc.nvidia.com/nvidia
+ChartName: gpu-operator
+version: v24.3.0
+
+autoSync: true
+namespace: gpu-operator
+release: gpu-operator
+
+valuesObject:
+  dcgmExporter:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        interval: 15s
+        honorLabels: true
+        additionalLabels:
+          release: kube-prometheus-stack

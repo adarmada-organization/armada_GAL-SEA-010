@@ -1,0 +1,5 @@
+component: cb3f1d8e-dac2-44b0-ad47-fc54045d5797
+repoURL: https://github.com/armada-galleons-dev/demo-marketplace-apps.git
+chartPath: charts/ops-safety/1.0.0-RELEASE/ops-safety
+targetRevision: main
+namespace: opssafe-cb3f1d8e-dac2-44b0-ad47-fc54045d5797

@@ -1,0 +1,5 @@
+component: e1b142ed-6d16-440c-bf3f-335457ddd668
+repoURL: https://github.com/armada-galleons-dev/demo-marketplace-apps.git
+chartPath: charts/narr8/1.0.0-RELEASE/narr8
+targetRevision: main
+namespace: narr-e1b142ed-6d16-440c-bf3f-335457ddd668

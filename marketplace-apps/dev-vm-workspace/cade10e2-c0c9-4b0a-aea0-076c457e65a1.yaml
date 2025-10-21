@@ -1,0 +1,5 @@
+component: cade10e2-c0c9-4b0a-aea0-076c457e65a1
+repoURL: https://github.com/armada-galleons-dev/demo-marketplace-apps.git
+chartPath: charts/dev-vm-workspace/0.1.0/dev-vm-workspace
+targetRevision: main
+namespace: devvmwork-cade10e2-c0c9-4b0a-aea0-076c457e65a1
