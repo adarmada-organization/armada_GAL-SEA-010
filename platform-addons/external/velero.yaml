@@ -94,7 +94,7 @@ valuesObject:
         snapshotMoveData: false
         snapshotVolumes: false
         storageLocation: cloud
-        ttl: 720h
+        ttl: 168h
         uploaderConfig:
           parallelFilesUpload: 12
       useOwnerReferencesInBackup: false
