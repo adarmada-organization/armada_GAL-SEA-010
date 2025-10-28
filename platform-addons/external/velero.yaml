@@ -82,7 +82,7 @@ valuesObject:
     volumeSnapshotLocation: []
   schedules:
     all-namespaces-fs:
-      schedule: 0 7 1 * *
+      schedule: 0 7 * * *
       skipImmediately: false
       template:
         csiSnapshotTimeout: 1h0m0s
