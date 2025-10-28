@@ -98,3 +98,4 @@ valuesObject:
         uploaderConfig:
           parallelFilesUpload: 12
       useOwnerReferencesInBackup: false
+      paused: false
